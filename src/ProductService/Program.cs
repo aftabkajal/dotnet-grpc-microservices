@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using ProductService.DataContext;
 using ProductService.Grpc;
@@ -22,16 +23,38 @@ builder.Services.AddGrpc(opt =>
     opt.EnableDetailedErrors = true;
 });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    int grpc_port = 8080;
+    int rest_port = 8081;
+
+    // Port for gRPC
+    options.ListenAnyIP(grpc_port, listenOptions =>
+    {
+        listenOptions.Protocols = HttpProtocols.Http2;
+    });
+
+    // Port for REST APIs and Swagger
+    options.ListenAnyIP(rest_port, listenOptions =>
+    {
+        listenOptions.Protocols = HttpProtocols.Http1;
+    });
+});
+
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+// Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Seed the database
 using (var scope = app.Services.CreateScope())

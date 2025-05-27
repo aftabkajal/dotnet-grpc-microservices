@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using ProductGrpc.Protos;
 using ProductService.Models;
-using ProductService.Protos;
 using ProductService.Services;
 
 namespace ProductService.Grpc;
 
-public class ProductGrpcService : Protos.ProductService.ProductServiceBase
+public class ProductGrpcService : ProductProtoService.ProductProtoServiceBase
 {
     private readonly IProductService _productService;
     private readonly IMapper _mapper;

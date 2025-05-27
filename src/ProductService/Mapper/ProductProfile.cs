@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Google.Protobuf.WellKnownTypes;
+using ProductGrpc.Protos;
 using ProductService.Models;
-using ProductService.Protos;
 
 namespace ProductService.Mapper
 {

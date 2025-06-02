@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using ProductGrpc.Protos;
+using ProductService.Converter;
 using ProductService.Models;
 using ProductService.Services;
 
@@ -46,6 +47,7 @@ public class ProductGrpcService : ProductProtoService.ProductProtoServiceBase
     public override async Task<ProductModel> AddProduct(AddProductRequest request, ServerCallContext context)
     {
         var product = _mapper.Map<Product>(request.Product);
+        product.CreatedTime = ProtoConverter.ProtoTimestampToDateTime(request.Product.CreatedTime);
         var addedProduct = await _productService.AddProductAsync(product);
 
         _logger.LogInformation("Added Product: {Id}_{Name}", addedProduct.ProductId, addedProduct.Name);
@@ -63,7 +65,9 @@ public class ProductGrpcService : ProductProtoService.ProductProtoServiceBase
             throw new RpcException(new Status(StatusCode.NotFound, $"Product with ID={product.ProductId} not found."));
         }
 
+        product.CreatedTime = ProtoConverter.ProtoTimestampToDateTime(request.Product.CreatedTime);
         var updatedProduct = await _productService.UpdateProductAsync(product);
+
         return _mapper.Map<ProductModel>(updatedProduct);
     }
 
